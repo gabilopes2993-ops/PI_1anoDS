@@ -1,4 +1,4 @@
-using Models;
 using Microsoft.EntityFrameworkCore;
+namespace Models;
 
-class Usuario
+public class Usuario;

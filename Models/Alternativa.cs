@@ -1,4 +1,6 @@
-using Models;
 using Microsoft.EntityFrameworkCore;
+namespace Models;
 
-class Alternativa
+public class Alternativa;
+
+

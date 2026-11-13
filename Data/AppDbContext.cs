@@ -1,4 +1,4 @@
-using PI_1anoDS.Models;
+using Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace PI_1anoDS.Data
