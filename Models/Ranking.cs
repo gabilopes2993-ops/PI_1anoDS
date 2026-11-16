@@ -1,8 +1,10 @@
+using PI_1anoDS.Data;
+using Microsoft.EntityFrameworkCore;
 public class Ranking
 {
     public void MostrarRanking()
     {
-        using (var context = new SeuDbContext())
+        using (var context = new AppDnContext())
         {
             var ranking = context.Resultados
                 .OrderByDescending(r => r.Pontuacao)

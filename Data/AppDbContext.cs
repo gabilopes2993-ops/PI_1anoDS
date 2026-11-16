@@ -10,6 +10,7 @@ namespace PI_1anoDS.Data
         public DbSet<Pergunta> Perguntas { get; set; }
         public DbSet<Alternativa> Alternativas { get; set; }
         public DbSet<Tentativa> Tentativas { get; set; }
+        public object rankings { get; internal set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
