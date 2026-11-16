@@ -47,8 +47,8 @@ protected override void OnModelCreating(ModelBuilder modelBuilder)
             AlternativaC = "Para dificultar invasões",
             AlternativaD = "Para evitar atualizações",
             RespostaCorreta = "C",
-            Pontos = 10
-        }
+            Pontos = 10,
+        },
         new Pergunta
 {
     IdPergunta = 3,

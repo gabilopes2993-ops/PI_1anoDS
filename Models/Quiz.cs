@@ -1,6 +1,10 @@
-public void IniciarQuiz()
+using System;
+using System.Linq;
+using PI_1anoDS.Data;
+
+ public void IniciarQuiz()
 {
-    int pontuacao = 0;
+    public int pontuacao = 0;
 
 
     foreach (var pergunta in perguntas)
@@ -25,5 +29,5 @@ public void IniciarQuiz()
         }
     }
 
-    Console.WriteLine("Pontuação final: " + pontuacao);
+     Console.WriteLine("Pontuação final: " + pontuacao);
 }
