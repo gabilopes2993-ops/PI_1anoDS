@@ -1,16 +1,14 @@
-using Models;
+using PI_1anoDS.Models;
 using Microsoft.EntityFrameworkCore;
-using PL_1AnoDS.Models;
+
 
 namespace PI_1anoDS.Data
 {
-    public class AppDnContext :DbContext
+    public class AppDbContext :DbContext
     {
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Pergunta> Perguntas { get; set; }
-        public DbSet<Alternativa> Alternativas { get; set; }
-        public DbSet<Tentativa> Tentativas { get; set; }
-        public object rankings { get; internal set; }
+        public DbSet <Ranking> Ranking { get; internal set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
