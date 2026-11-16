@@ -1,5 +1,6 @@
 using Models;
 using Microsoft.EntityFrameworkCore;
+using PL_1AnoDS.Models;
 
 namespace PI_1anoDS.Data
 {
