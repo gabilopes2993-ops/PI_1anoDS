@@ -1,4 +1,4 @@
-using PI_1anoDS.Data;
+using PI_1anoDS.Data;                       
 using PI_1anoDS.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,11 +32,15 @@ namespace PI_1anoDS.Models
 
                 int posicao = 1;
 
-                foreach (var jogador in ranking)
+                foreach (var resultado in ranking)
                 {
+                    string nome = resultado.Usuario != null
+                        ? resultado.Usuario.Nome
+                        : "Usuário não encontrado";
+
                     Console.WriteLine(
-                        $"{posicao}º - {jogador.Usuario.Nome} | " +
-                        $"{jogador.Pontuacao} pontos"
+                        $"{posicao}º - {nome} | " +
+                        $"{resultado.Pontuacao} pontos"
                     );
 
                     posicao++;
