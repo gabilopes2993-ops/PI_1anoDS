@@ -86,3 +86,4 @@ new Pergunta
 }
     );
 }
+public DbSet<Resultado> Resultados { get; set; }
