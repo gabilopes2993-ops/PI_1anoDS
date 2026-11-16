@@ -1,46 +1,85 @@
 
+
 using System;
 using System.Linq;
 using PI_1anoDS.Data;
+using PI_1anoDS.Models;
+using PI_1AnoDS.Models;
 
-namespace PI_1anoDS.Models
+namespace PI_1AnoDS.Models
 {
     public class Quiz
     {
-        public void IniciarQuiz()
+        public void IniciarQuiz(AppDbContext context, Usuario usuario)
         {
             int pontuacao = 0;
 
-            using (var context = new AppDbContext())
+            Console.Clear();
+            Console.WriteLine("==============================");
+            Console.WriteLine("       QUIZ NAVEGASEGURO");
+            Console.WriteLine("==============================");
+            Console.WriteLine("Jogador: " + usuario.Nome);
+
+            var perguntas = context.Perguntas.ToList();
+
+            if (perguntas.Count == 0)
             {
-                var perguntas = context.Perguntas.ToList();
+                Console.WriteLine("Nenhuma pergunta cadastrada.");
+                return;
+            }
 
-                foreach (var pergunta in perguntas)
+            foreach (var pergunta in perguntas)
+            {
+                Console.WriteLine("\n" + pergunta.Enunciado);
+                Console.WriteLine("A) " + pergunta.AlternativaA);
+                Console.WriteLine("B) " + pergunta.AlternativaB);
+                Console.WriteLine("C) " + pergunta.AlternativaC);
+                Console.WriteLine("D) " + pergunta.AlternativaD);
+
+                string resposta;
+
+                while (true)
                 {
-                    Console.WriteLine(pergunta.Enunciado);
-                    Console.WriteLine("A) " + pergunta.AlternativaA);
-                    Console.WriteLine("B) " + pergunta.AlternativaB);
-                    Console.WriteLine("C) " + pergunta.AlternativaC);
-                    Console.WriteLine("D) " + pergunta.AlternativaD);
+                    Console.Write("Sua resposta (A/B/C/D): ");
+                    resposta = (Console.ReadLine() ?? "")
+                        .Trim()
+                        .ToUpper();
 
-                    Console.Write("Sua resposta: ");
-                    string resposta = Console.ReadLine();
+                    if (resposta == "A" || resposta == "B" ||
+                        resposta == "C" || resposta == "D")
+                        break;
 
-                    if (resposta?.Trim().ToUpper() == pergunta.RespostaCorreta.ToUpper())
-                    {
-                        Console.WriteLine("Resposta correta!");
-                        pontuacao += pergunta.Pontos;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Resposta incorreta!");
-                    }
+                    Console.WriteLine("Alternativa inválida!");
+                }
 
-                    Console.WriteLine();
+                if (resposta == pergunta.RespostaCorreta.Trim().ToUpper())
+                {
+                    Console.WriteLine("Resposta correta!");
+                    pontuacao += pergunta.Pontos;
+                }
+                else
+                {
+                    Console.WriteLine("Resposta incorreta!");
+                    Console.WriteLine("Explicação: " + pergunta.Explicacao);
                 }
             }
 
-            Console.WriteLine("Pontuação final: " + pontuacao);
+            Console.WriteLine("\n==============================");
+            Console.WriteLine("       RESULTADO FINAL");
+            Console.WriteLine("==============================");
+            Console.WriteLine("Jogador: " + usuario.Nome);
+            Console.WriteLine("Pontuação: " + pontuacao);
+
+            
+            Ranking novoRanking = new Ranking();
+
+            novoRanking.UsuarioId = usuario.Id;
+            novoRanking.Pontuacao = pontuacao;
+
+            context.Ranking.Add(novoRanking);
+            context.SaveChanges();
+
+            Console.WriteLine("\nPontuação salva no ranking!");
         }
     }
 }
