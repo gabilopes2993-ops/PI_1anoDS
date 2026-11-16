@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using PI_1anoDS.Models;
+using PI_1AnoDS.Models;
 
 namespace PI_1anoDS.Data
 {
@@ -8,7 +9,7 @@ namespace PI_1anoDS.Data
     {
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Pergunta> Perguntas { get; set; }
-        public DbSet<Resultado> Resultados { get; set; }
+        public DbSet<Ranking> Rankings { get; set; }
 
         protected override void OnConfiguring(
             DbContextOptionsBuilder optionsBuilder)
@@ -84,6 +85,10 @@ namespace PI_1anoDS.Data
                 }
             );
         }
-        public DbSet<Ranking> Rankings { get; set; }
+        public DbSet<Ranking> Ranking { get; set; }
+    }
+
+    public class Resultado
+    {
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PI_1anoDS.Data;
 
 
-namespace PL_1AnoDS.Models
+namespace PI_1AnoDS.Models
 {
     public class Usuario
     {

@@ -1,6 +1,7 @@
 using PI_1anoDS.Data;                       
 using PI_1anoDS.Models;
 using Microsoft.EntityFrameworkCore;
+using PI_1AnoDS.Models;
 
 namespace PI_1anoDS.Models
 {
@@ -9,7 +10,7 @@ namespace PI_1anoDS.Models
         public int IdRanking { get; set; }
 
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; }
+        public Usuario? Usuario { get; set; }
 
         public int Pontuacao { get; set; }
 
@@ -17,7 +18,7 @@ namespace PI_1anoDS.Models
         {
             using (var context = new AppDbContext())
             {
-                var ranking = context.Rankings
+                var ranking = context.Ranking
                     .Include(r => r.Usuario)
                     .OrderByDescending(r => r.Pontuacao)
                     .ToList();

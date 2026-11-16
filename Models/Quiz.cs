@@ -11,7 +11,7 @@ namespace PI_1anoDS.Models
         {
             int pontuacao = 0;
 
-            using (var context = new SeuDbContext())
+            using (var context = new AppDbContext())
             {
                 var perguntas = context.Perguntas.ToList();
 
