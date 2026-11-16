@@ -2,11 +2,13 @@ using PI_1anoDS.Data;
 using PI_1anoDS.Models;
 using Microsoft.EntityFrameworkCore;
 using PI_1AnoDS.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace PI_1anoDS.Models
 {
     public class Ranking
     {
+        [Key]
         public int IdRanking { get; set; }
 
         public int UsuarioId { get; set; }
