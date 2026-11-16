@@ -1,3 +1,5 @@
+using PI_1anoDS.Data;
+using Microsoft.EntityFrameworkCore;
 public class Ranking
 {
     public void MostrarRanking()

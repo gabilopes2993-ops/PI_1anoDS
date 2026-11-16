@@ -1,6 +1,6 @@
-
-using System;
-using System.Linq;
+using System.Net.Mail;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using PI_1anoDS.Data;
 
 
@@ -8,106 +8,139 @@ namespace PL_1AnoDS.Models
 {
     public class Usuario
     {
-        
-        private int id;
-        private string nome = "";
-        private string email = "";
+        public int Id { get; set; }
 
-        
-        public Usuario()
-        {
-        }
+        [Required]
+        [MaxLength(100)]
+        public string Nome { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(150)]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        public Usuario() { }
 
         public Usuario(int id, string nome, string email)
         {
-            this.id = id;
+            Id = id;
             Nome = nome;
             Email = email;
         }
 
         
-        public int Id
+        private static bool ValidarNome(string nome)
         {
-            get { return id; }
-            set { id = value; }
-        }
-
-        public string Nome
-        {
-            get { return nome; }
-            set
+            if (string.IsNullOrWhiteSpace(nome))
             {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    Console.WriteLine("O nome não pode ser vazio.");
-                }
-                else
-                {
-                    nome = value.Trim();
-                }
+                Console.WriteLine("O nome não pode ficar vazio.");
+                return false;
             }
-        }
 
-        public string Email
-        {
-            get { return email; }
-            set
+            nome = nome.Trim();
+
+            if (nome.Length < 2 || nome.Length > 100)
             {
-                if (string.IsNullOrWhiteSpace(value) ||
-                    !value.Contains("@") ||
-                    !value.Contains("."))
-                {
-                    Console.WriteLine("E-mail inválido.");
-                }
-                else
-                {
-                    email = value.Trim().ToLower();
-                }
+                Console.WriteLine("O nome deve ter entre 2 e 100 caracteres.");
+                return false;
             }
+
+            if (nome.Any(char.IsDigit))
+            {
+                Console.WriteLine("O nome não pode conter números.");
+                return false;
+            }
+
+            if (!nome.All(c =>
+                char.IsLetter(c) ||
+                char.IsWhiteSpace(c) ||
+                c == '-' ||
+                c == '\''))
+            {
+                Console.WriteLine("O nome contém caracteres inválidos.");
+                return false;
+            }
+
+            return true;
         }
 
         
-        private bool ExisteEmail(AppDnContext context, string email)
+        private static bool ValidarEmail(string email)
         {
-            return context.Usuarios.Any(
-                u => u.Email == email
-            );
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                Console.WriteLine("O e-mail não pode ficar vazio.");
+                return false;
+            }
+
+            email = email.Trim();
+
+            if (email.Length > 150)
+            {
+                Console.WriteLine("O e-mail deve ter no máximo 150 caracteres.");
+                return false;
+            }
+
+            try
+            {
+                var endereco = new MailAddress(email);
+
+                if (endereco.Address != email ||
+                    !email.Contains('.') ||
+                    email.StartsWith("@") ||
+                    email.EndsWith("@"))
+                {
+                    Console.WriteLine("Digite um e-mail válido.");
+                    return false;
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Digite um e-mail válido.");
+                return false;
+            }
+
+            return true;
+        }
+
+        
+        private static bool EmailExiste(
+            AppDnContext context,
+            string email,
+            int idIgnorado = 0)
+        {
+            string emailNormalizado = email.Trim().ToLower();
+
+            return context.Usuarios.Any(u =>
+                u.Id != idIgnorado &&
+                u.Email.ToLower() == emailNormalizado);
         }
 
         
         public void CadastrarUsuario(AppDnContext context)
         {
-            while (true)
+            Console.WriteLine("\n===== CADASTRO DE USUÁRIO =====");
+
+            string nome;
+
+            do
             {
                 Console.Write("Digite seu nome: ");
-                string nome = Console.ReadLine() ?? "";
+                nome = Console.ReadLine() ?? "";
 
-                if (string.IsNullOrWhiteSpace(nome))
-                {
-                    Console.WriteLine("Nome inválido. Tente novamente.");
-                    continue;
-                }
+            } while (!ValidarNome(nome));
 
-                Nome = nome;
-                break;
-            }
+            string email;
 
             while (true)
             {
                 Console.Write("Digite seu e-mail: ");
-                string email = Console.ReadLine() ?? "";
+                email = (Console.ReadLine() ?? "").Trim().ToLower();
 
-                if (string.IsNullOrWhiteSpace(email) ||
-                    !email.Contains("@") ||
-                    !email.Contains("."))
-                {
-                    Console.WriteLine("E-mail inválido. Tente novamente.");
+                if (!ValidarEmail(email))
                     continue;
-                }
 
-                Email = email;
-
-                if (ExisteEmail(context, Email))
+                if (EmailExiste(context, email))
                 {
                     Console.WriteLine("Este e-mail já está cadastrado.");
                     continue;
@@ -116,78 +149,98 @@ namespace PL_1AnoDS.Models
                 break;
             }
 
-            
+            Nome = nome.Trim();
+            Email = email;
+
             context.Usuarios.Add(this);
             context.SaveChanges();
 
-            Console.WriteLine("Usuário cadastrado com sucesso!");
+            Console.WriteLine("\nUsuário cadastrado com sucesso!");
         }
 
         
         public void LerUsuarios(AppDnContext context)
         {
-            var lista = context.Usuarios.ToList();
+            Console.WriteLine("\n===== USUÁRIOS CADASTRADOS =====");
 
-            if (lista.Count == 0)
+            var usuarios = context.Usuarios
+                .AsNoTracking()
+                .OrderBy(u => u.Nome)
+                .ToList();
+
+            if (usuarios.Count == 0)
             {
                 Console.WriteLine("Nenhum usuário cadastrado.");
                 return;
             }
 
-            Console.WriteLine("\nUsuários cadastrados:");
-
-            foreach (var usuario in lista)
+            foreach (var usuario in usuarios)
             {
-                Console.WriteLine(
-                    $"ID: {usuario.Id} | Nome: {usuario.Nome} | E-mail: {usuario.Email}"
-                );
+                Console.WriteLine("----------------------------");
+                Console.WriteLine($"ID: {usuario.Id}");
+                Console.WriteLine($"Nome: {usuario.Nome}");
+                Console.WriteLine($"E-mail: {usuario.Email}");
             }
         }
 
         
-        public void BuscarUsuario(AppDnContext context)
+        public Usuario? BuscarUsuario(AppDnContext context)
         {
-            Console.Write("Digite o nome do usuário: ");
-            string nome = Console.ReadLine() ?? "";
+            Console.WriteLine("\n===== BUSCAR USUÁRIO =====");
+            Console.Write("Digite o e-mail: ");
 
-            if (string.IsNullOrWhiteSpace(nome))
-            {
-                Console.WriteLine("Nome inválido.");
-                return;
-            }
+            string email = (Console.ReadLine() ?? "").Trim().ToLower();
 
-            var usuario = context.Usuarios
-                .FirstOrDefault(u => u.Nome.Contains(nome));
+            if (!ValidarEmail(email))
+                return null;
+
+            Usuario? usuario = context.Usuarios
+                .AsNoTracking()
+                .FirstOrDefault(u => u.Email.ToLower() == email);
 
             if (usuario == null)
             {
                 Console.WriteLine("Usuário não encontrado.");
-                return;
+                return null;
             }
 
-            Console.WriteLine(
-                $"ID: {usuario.Id} | Nome: {usuario.Nome} | E-mail: {usuario.Email}"
-            );
+            Console.WriteLine("\nUsuário encontrado!");
+            Console.WriteLine($"ID: {usuario.Id}");
+            Console.WriteLine($"Nome: {usuario.Nome}");
+            Console.WriteLine($"E-mail: {usuario.Email}");
+
+            return usuario;
         }
 
         
         public void ExcluirUsuario(AppDnContext context)
         {
-            LerUsuarios(context);
+            Console.WriteLine("\n===== EXCLUIR USUÁRIO =====");
+            Console.Write("Digite o ID do usuário: ");
 
-            Console.Write("\nDigite o ID do usuário que deseja excluir: ");
-
-            if (!int.TryParse(Console.ReadLine(), out int id))
+            if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
             {
                 Console.WriteLine("ID inválido.");
                 return;
             }
 
-            var usuario = context.Usuarios.Find(id);
+            Usuario? usuario = context.Usuarios.Find(id);
 
             if (usuario == null)
             {
                 Console.WriteLine("Usuário não encontrado.");
+                return;
+            }
+
+            Console.WriteLine($"Nome: {usuario.Nome}");
+            Console.WriteLine($"E-mail: {usuario.Email}");
+
+            Console.Write("Confirma a exclusão? (S/N): ");
+            string confirmacao = (Console.ReadLine() ?? "").Trim().ToUpper();
+
+            if (confirmacao != "S")
+            {
+                Console.WriteLine("Exclusão cancelada.");
                 return;
             }
 
@@ -200,17 +253,16 @@ namespace PL_1AnoDS.Models
         
         public void AtualizarUsuario(AppDnContext context)
         {
-            LerUsuarios(context);
+            Console.WriteLine("\n===== ATUALIZAR USUÁRIO =====");
+            Console.Write("Digite o ID do usuário: ");
 
-            Console.Write("\nDigite o ID do usuário: ");
-
-            if (!int.TryParse(Console.ReadLine(), out int id))
+            if (!int.TryParse(Console.ReadLine(), out int id) || id <= 0)
             {
                 Console.WriteLine("ID inválido.");
                 return;
             }
 
-            var usuario = context.Usuarios.Find(id);
+            Usuario? usuario = context.Usuarios.Find(id);
 
             if (usuario == null)
             {
@@ -218,69 +270,46 @@ namespace PL_1AnoDS.Models
                 return;
             }
 
+            Console.WriteLine($"Nome atual: {usuario.Nome}");
+            Console.WriteLine($"E-mail atual: {usuario.Email}");
+
+            // ATUALIZAR NOME
             while (true)
             {
-                Console.WriteLine("O que deseja atualizar? ");
-                Console.WriteLine("1 - Nome");
-                Console.WriteLine("2 - E-mail");
-                Console.WriteLine("3 - Sair");
-                Console.Write("Escolha: ");
+                Console.Write("\nNovo nome: ");
+                string novoNome = Console.ReadLine() ?? "";
 
-                string opcao = Console.ReadLine() ?? "";
-
-                switch (opcao)
+                if (ValidarNome(novoNome))
                 {
-                    case "1":
-                        Console.Write("Digite o novo nome: ");
-                        string novoNome = Console.ReadLine() ?? "";
-
-                        if (string.IsNullOrWhiteSpace(novoNome))
-                        {
-                            Console.WriteLine("Nome inválido.");
-                            continue;
-                        }
-
-                        usuario.Nome = novoNome;
-                        context.SaveChanges();
-
-                        Console.WriteLine("Nome atualizado com sucesso!");
-                        return;
-
-                    case "2":
-                        Console.Write("Digite o novo e-mail: ");
-                        string novoEmail = Console.ReadLine() ?? "";
-
-                        if (string.IsNullOrWhiteSpace(novoEmail) ||
-                            !novoEmail.Contains("@") ||
-                            !novoEmail.Contains("."))
-                        {
-                            Console.WriteLine("E-mail inválido.");
-                            continue;
-                        }
-
-                        novoEmail = novoEmail.Trim().ToLower();
-
-                        if (ExisteEmail(context, novoEmail))
-                        {
-                            Console.WriteLine("Este e-mail já está cadastrado.");
-                            continue;
-                        }
-
-                        usuario.Email = novoEmail;
-                        context.SaveChanges();
-
-                        Console.WriteLine("E-mail atualizado com sucesso!");
-                        return;
-
-                    case "3":
-                        Console.WriteLine("Saindo...");
-                        return;
-
-                    default:
-                        Console.WriteLine("Opção inválida. Tente novamente.");
-                        break;
+                    usuario.Nome = novoNome.Trim();
+                    break;
                 }
             }
+
+            
+            while (true)
+            {
+                Console.Write("Novo e-mail: ");
+                string novoEmail = (Console.ReadLine() ?? "")
+                    .Trim()
+                    .ToLower();
+
+                if (!ValidarEmail(novoEmail))
+                    continue;
+
+                if (EmailExiste(context, novoEmail, usuario.Id))
+                {
+                    Console.WriteLine("Este e-mail já pertence a outro usuário.");
+                    continue;
+                }
+
+                usuario.Email = novoEmail;
+                break;
+            }
+
+            context.SaveChanges();
+
+            Console.WriteLine("\nUsuário atualizado com sucesso!");
         }
     }
 }
