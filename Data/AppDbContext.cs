@@ -26,7 +26,7 @@ namespace PI_1anoDS.Data
             modelBuilder.Entity<Pergunta>().HasData(
                 new Pergunta
                 {
-                    IdPergunta = 1,
+                    Id = 1,
                     Enunciado = "O que é phishing?",
                     AlternativaA = "Um antivírus",
                     AlternativaB = "Um golpe para roubar informações",
@@ -38,7 +38,7 @@ namespace PI_1anoDS.Data
 
                 new Pergunta
                 {
-                    IdPergunta = 2,
+                    Id = 2,
                     Enunciado = "Por que devemos utilizar senhas fortes?",
                     AlternativaA = "Para facilitar o acesso",
                     AlternativaB = "Para compartilhar contas",
@@ -50,7 +50,7 @@ namespace PI_1anoDS.Data
 
                 new Pergunta
                 {
-                    IdPergunta = 3,
+                    Id = 3,
                     Enunciado = "O que é autenticação de dois fatores (2FA)?",
                     AlternativaA = "Uma senha com dois números",
                     AlternativaB = "Uma camada extra de segurança que exige duas formas de verificação",
@@ -62,7 +62,7 @@ namespace PI_1anoDS.Data
 
                 new Pergunta
                 {
-                    IdPergunta = 4,
+                    Id = 4,
                     Enunciado = "O que devemos fazer ao receber um e-mail suspeito com um link?",
                     AlternativaA = "Clicar para verificar o conteúdo",
                     AlternativaB = "Encaminhar para todos os contatos",
@@ -74,7 +74,7 @@ namespace PI_1anoDS.Data
 
                 new Pergunta
                 {
-                    IdPergunta = 5,
+                    Id = 5,
                     Enunciado = "Qual é a principal função de um antivírus?",
                     AlternativaA = "Criar senhas automaticamente",
                     AlternativaB = "Proteger o computador contra softwares maliciosos",
