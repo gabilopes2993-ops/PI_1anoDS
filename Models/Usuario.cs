@@ -105,7 +105,7 @@ namespace PL_1AnoDS.Models
 
         
         private static bool EmailExiste(
-            AppDnContext context,
+            AppDbContext context,
             string email,
             int idIgnorado = 0)
         {
@@ -117,7 +117,7 @@ namespace PL_1AnoDS.Models
         }
 
         
-        public void CadastrarUsuario(AppDnContext context)
+        public void CadastrarUsuario(AppDbContext context)
         {
             Console.WriteLine("\n===== CADASTRO DE USUÁRIO =====");
 
@@ -159,7 +159,7 @@ namespace PL_1AnoDS.Models
         }
 
         
-        public void LerUsuarios(AppDnContext context)
+        public void LerUsuarios(AppDbContext context)
         {
             Console.WriteLine("\n===== USUÁRIOS CADASTRADOS =====");
 
@@ -184,7 +184,7 @@ namespace PL_1AnoDS.Models
         }
 
         
-        public Usuario? BuscarUsuario(AppDnContext context)
+        public Usuario? BuscarUsuario(AppDbContext context)
         {
             Console.WriteLine("\n===== BUSCAR USUÁRIO =====");
             Console.Write("Digite o e-mail: ");
@@ -213,7 +213,7 @@ namespace PL_1AnoDS.Models
         }
 
         
-        public void ExcluirUsuario(AppDnContext context)
+        public void ExcluirUsuario(AppDbContext context)
         {
             Console.WriteLine("\n===== EXCLUIR USUÁRIO =====");
             Console.Write("Digite o ID do usuário: ");
@@ -251,7 +251,7 @@ namespace PL_1AnoDS.Models
         }
 
         
-        public void AtualizarUsuario(AppDnContext context)
+        public void AtualizarUsuario(AppDbContext context)
         {
             Console.WriteLine("\n===== ATUALIZAR USUÁRIO =====");
             Console.Write("Digite o ID do usuário: ");
