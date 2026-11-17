@@ -70,14 +70,14 @@ namespace PI_1AnoDS
             } while (opcao != 0);
         }
 
-        // MÉTODO PARA PAUSAR A TELA
+        
         static void Pausar()
         {
             Console.WriteLine("\nPressione ENTER para continuar...");
             Console.ReadLine();
         }
 
-        // LER NÚMEROS COM VALIDAÇÃO
+        
         static int LerInteiro(string mensagem, int minimo = 0)
         {
             while (true)
@@ -94,7 +94,7 @@ namespace PI_1AnoDS
             }
         }
 
-        // MENU DO JOGADOR
+        
         static void MenuJogador()
         {
             using var context = new AppDbContext();
@@ -200,7 +200,7 @@ namespace PI_1AnoDS
             } while (opcao != 0);
         }
 
-        // LOGIN DO ADMINISTRADOR
+        
         static void LoginAdministrador()
         {
             Console.Clear();
@@ -225,7 +225,7 @@ namespace PI_1AnoDS
             MenuAdministrador();
         }
 
-        // MENU DO ADMINISTRADOR
+    
         static void MenuAdministrador()
         {
             int opcao = -1;
@@ -297,7 +297,7 @@ namespace PI_1AnoDS
             } while (opcao != 0);
         }
 
-        // ADICIONAR PERGUNTA
+        
         static void AdicionarPergunta()
         {
             using var context = new AppDbContext();
@@ -354,7 +354,7 @@ namespace PI_1AnoDS
             Console.WriteLine("\nPergunta cadastrada com sucesso!");
         }
 
-        // VALIDAR RESPOSTA
+        
         static string LerResposta()
         {
             while (true)
@@ -374,7 +374,7 @@ namespace PI_1AnoDS
             }
         }
 
-        // LISTAR PERGUNTAS
+        
         static void ListarPerguntas()
         {
             using var context = new AppDbContext();
@@ -408,7 +408,7 @@ namespace PI_1AnoDS
             }
         }
 
-        // ATUALIZAR PERGUNTA
+        
         static void AtualizarPergunta()
         {
             using var context = new AppDbContext();
@@ -477,7 +477,7 @@ namespace PI_1AnoDS
             Console.WriteLine("\nPergunta atualizada com sucesso!");
         }
 
-        // EXCLUIR PERGUNTA
+        
         static void ExcluirPergunta()
         {
             using var context = new AppDbContext();
@@ -513,7 +513,7 @@ namespace PI_1AnoDS
             Console.WriteLine("Pergunta excluída com sucesso!");
         }
 
-        // MOSTRAR RANKING
+        
         static void MostrarRanking(AppDbContext context)
         {
             Console.Clear();
