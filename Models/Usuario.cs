@@ -10,14 +10,13 @@ namespace PI_1AnoDS.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(100)]
         public string Nome { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(150)]
-        [EmailAddress]
+
         public string Email { get; set; } = string.Empty;
+
+        public string? Senha { get; set; } = "";
+        public string? TipoUsuario { get; internal set; }
 
         public Usuario() { }
 

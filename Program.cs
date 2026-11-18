@@ -10,33 +10,19 @@ namespace PI_1AnoDS
 {
     internal class Program
     {
-        private const string SenhaAdmin = "admin123";
-
         static void Main(string[] args)
         {
-            int opcao = -1;
+            int opcao;
 
             do
             {
                 Console.Clear();
-
-                Console.WriteLine("================================");
-                Console.WriteLine("        NAVEGASEGURO");
-                Console.WriteLine("================================");
+                Console.WriteLine("===== NAVEGASEGURO =====");
                 Console.WriteLine("1 - Jogador");
                 Console.WriteLine("2 - Administrador");
                 Console.WriteLine("0 - Sair");
-                Console.WriteLine("================================");
 
-                Console.Write("Escolha uma opção: ");
-
-                if (!int.TryParse(Console.ReadLine(), out opcao))
-                {
-                    Console.WriteLine("\nDigite uma opção válida!");
-                    Pausar();
-                    opcao = -1;
-                    continue;
-                }
+                opcao = LerInteiro("Escolha: ");
 
                 try
                 {
@@ -45,15 +31,12 @@ namespace PI_1AnoDS
                         case 1:
                             MenuJogador();
                             break;
-
                         case 2:
                             LoginAdministrador();
                             break;
-
                         case 0:
-                            Console.WriteLine("Obrigado por utilizar o NavegarSeguro");
+                            Console.WriteLine("Até logo!");
                             break;
-
                         default:
                             Console.WriteLine("Opção inválida!");
                             Pausar();
@@ -62,35 +45,44 @@ namespace PI_1AnoDS
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("\nOcorreu um erro:");
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("Erro: " + ex.Message);
                     Pausar();
                 }
 
             } while (opcao != 0);
         }
 
-        
         static void Pausar()
         {
-            Console.WriteLine("Pressione ENTER para continuar...");
+            Console.WriteLine("\nPressione ENTER para continuar");
             Console.ReadLine();
         }
 
-        
         static int LerInteiro(string mensagem, int minimo = 0)
         {
             while (true)
             {
                 Console.Write(mensagem);
 
-                if (int.TryParse(Console.ReadLine(), out int valor)
-                    && valor >= minimo)
-                {
-                    return valor;
-                }
+                if (int.TryParse(Console.ReadLine(), out int numero)
+                    && numero >= minimo)
+                    return numero;
 
-                Console.WriteLine("Valor inválido! Tente novamente.");
+                Console.WriteLine("Digite um número válido!");
+            }
+        }
+
+        static string LerTexto(string mensagem)
+        {
+            while (true)
+            {
+                Console.Write(mensagem);
+                string texto = (Console.ReadLine() ?? "").Trim();
+
+                if (texto != "")
+                    return texto;
+
+                Console.WriteLine("Este campo é obrigatório!");
             }
         }
 
@@ -100,12 +92,9 @@ namespace PI_1AnoDS
             using var context = new AppDbContext();
 
             Console.Clear();
-            Console.WriteLine("================================");
-            Console.WriteLine("          ÁREA DO JOGADOR");
-            Console.WriteLine("================================");
-            Console.Write("Digite seu e-mail: ");
+            Console.WriteLine("===== LOGIN DO JOGADOR =====");
 
-            string email = (Console.ReadLine() ?? "").Trim().ToLower();
+            string email = LerTexto("E-mail: ").ToLower();
 
             Usuario? usuario = context.Usuarios
                 .FirstOrDefault(u => u.Email.ToLower() == email);
@@ -119,52 +108,45 @@ namespace PI_1AnoDS
                     .Trim().ToUpper();
 
                 if (resposta != "S")
+                    return;
+
+                usuario = CadastrarJogador(context, email);
+            }
+            else
+            {
+                if (usuario.TipoUsuario != "Jogador")
                 {
-                    Console.WriteLine("Voltando ao menu principal");
+                    Console.WriteLine("Esta conta não é de jogador.");
                     Pausar();
                     return;
                 }
 
-                Usuario novoUsuario = new Usuario();
-                novoUsuario.CadastrarUsuario(context);
+                Console.Write("Senha: ");
+                string senha = Console.ReadLine() ?? "";
 
-                email = novoUsuario.Email;
-
-                usuario = context.Usuarios
-                    .FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
-
-                if (usuario == null)
+                if (usuario.Senha != senha)
                 {
-                    Console.WriteLine("Não foi possível localizar o cadastro.");
+                    Console.WriteLine("\nSenha incorreta!");
                     Pausar();
                     return;
                 }
             }
 
-            int opcao = -1;
+            Console.WriteLine("\nLogin realizado com sucesso!");
+            Pausar();
+
+            int opcao;
 
             do
             {
                 Console.Clear();
-
-                Console.WriteLine("================================");
-                Console.WriteLine("         MENU DO JOGADOR");
-                Console.WriteLine("================================");
+                Console.WriteLine("===== MENU DO JOGADOR =====");
                 Console.WriteLine($"Jogador: {usuario.Nome}");
                 Console.WriteLine("1 - Jogar quiz");
                 Console.WriteLine("2 - Consultar ranking");
                 Console.WriteLine("0 - Voltar");
-                Console.WriteLine("================================");
 
-                Console.Write("Escolha: ");
-
-                if (!int.TryParse(Console.ReadLine(), out opcao))
-                {
-                    Console.WriteLine("Opção inválida!");
-                    Pausar();
-                    opcao = -1;
-                    continue;
-                }
+                opcao = LerInteiro("Escolha: ");
 
                 try
                 {
@@ -175,16 +157,12 @@ namespace PI_1AnoDS
                             quiz.IniciarQuiz(context, usuario);
                             Pausar();
                             break;
-
                         case 2:
                             MostrarRanking(context);
                             Pausar();
                             break;
-
                         case 0:
-                            Console.WriteLine("Voltando ao menu principal...");
                             break;
-
                         default:
                             Console.WriteLine("Opção inválida!");
                             Pausar();
@@ -193,7 +171,7 @@ namespace PI_1AnoDS
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("\nErro: " + ex.Message);
+                    Console.WriteLine("Erro: " + ex.Message);
                     Pausar();
                 }
 
@@ -201,20 +179,52 @@ namespace PI_1AnoDS
         }
 
         
-        static void LoginAdministrador()
+        static Usuario CadastrarJogador(AppDbContext context, string email)
         {
             Console.Clear();
+            Console.WriteLine("===== CADASTRO DO JOGADOR =====");
 
-            Console.WriteLine("================================");
-            Console.WriteLine("      LOGIN ADMINISTRADOR");
-            Console.WriteLine("================================");
-            Console.Write("Digite a senha: ");
+            string nome = LerTexto("Nome: ");
+            string senha = LerTexto("Crie uma senha: ");
 
+            Usuario usuario = new Usuario
+            {
+                Nome = nome,
+                Email = email,
+                Senha = senha,
+                TipoUsuario = "Jogador"
+            };
+
+            context.Usuarios.Add(usuario);
+            context.SaveChanges();
+
+            Console.WriteLine("\nCadastro realizado com sucesso!");
+
+            return usuario;
+        }
+
+        
+        static void LoginAdministrador()
+        {
+            using var context = new AppDbContext();
+
+            Console.Clear();
+            Console.WriteLine("===== LOGIN ADMINISTRADOR =====");
+
+            string email = LerTexto("E-mail: ").ToLower();
+
+            Console.Write("Senha: ");
             string senha = Console.ReadLine() ?? "";
 
-            if (senha != SenhaAdmin)
+            Usuario? admin = context.Usuarios
+                .FirstOrDefault(u =>
+                    u.Email.ToLower() == email &&
+                    u.Senha == senha &&
+                    u.TipoUsuario == "Admin");
+
+            if (admin == null)
             {
-                Console.WriteLine("\nSenha incorreta!");
+                Console.WriteLine("\nE-mail ou senha incorretos!");
                 Pausar();
                 return;
             }
@@ -225,34 +235,22 @@ namespace PI_1AnoDS
             MenuAdministrador();
         }
 
-    
+        
         static void MenuAdministrador()
         {
-            int opcao = -1;
+            int opcao;
 
             do
             {
                 Console.Clear();
-
-                Console.WriteLine("================================");
-                Console.WriteLine("      MENU ADMINISTRADOR");
-                Console.WriteLine("================================");
+                Console.WriteLine("===== MENU ADMINISTRADOR =====");
                 Console.WriteLine("1 - Adicionar pergunta");
                 Console.WriteLine("2 - Listar perguntas");
                 Console.WriteLine("3 - Atualizar pergunta");
                 Console.WriteLine("4 - Excluir pergunta");
                 Console.WriteLine("0 - Voltar");
-                Console.WriteLine("================================");
 
-                Console.Write("Escolha: ");
-
-                if (!int.TryParse(Console.ReadLine(), out opcao))
-                {
-                    Console.WriteLine("Opção inválida!");
-                    Pausar();
-                    opcao = -1;
-                    continue;
-                }
+                opcao = LerInteiro("Escolha: ");
 
                 try
                 {
@@ -262,26 +260,20 @@ namespace PI_1AnoDS
                             AdicionarPergunta();
                             Pausar();
                             break;
-
                         case 2:
                             ListarPerguntas();
                             Pausar();
                             break;
-
                         case 3:
                             AtualizarPergunta();
                             Pausar();
                             break;
-
                         case 4:
                             ExcluirPergunta();
                             Pausar();
                             break;
-
                         case 0:
-                            Console.WriteLine("Voltando ao menu principal...");
                             break;
-
                         default:
                             Console.WriteLine("Opção inválida!");
                             Pausar();
@@ -290,7 +282,7 @@ namespace PI_1AnoDS
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("\nErro: " + ex.Message);
+                    Console.WriteLine("Erro: " + ex.Message);
                     Pausar();
                 }
 
@@ -305,43 +297,15 @@ namespace PI_1AnoDS
             Console.Clear();
             Console.WriteLine("===== ADICIONAR PERGUNTA =====");
 
-            Pergunta pergunta = new Pergunta();
-
-            do
+            Pergunta pergunta = new Pergunta
             {
-                Console.Write("Enunciado: ");
-                pergunta.Enunciado = Console.ReadLine() ?? "";
-
-                if (string.IsNullOrWhiteSpace(pergunta.Enunciado))
-                    Console.WriteLine("O enunciado não pode ficar vazio.");
-
-            } while (string.IsNullOrWhiteSpace(pergunta.Enunciado));
-
-            do
-            {
-                Console.Write("Alternativa A: ");
-                pergunta.AlternativaA = Console.ReadLine() ?? "";
-            } while (string.IsNullOrWhiteSpace(pergunta.AlternativaA));
-
-            do
-            {
-                Console.Write("Alternativa B: ");
-                pergunta.AlternativaB = Console.ReadLine() ?? "";
-            } while (string.IsNullOrWhiteSpace(pergunta.AlternativaB));
-
-            do
-            {
-                Console.Write("Alternativa C: ");
-                pergunta.AlternativaC = Console.ReadLine() ?? "";
-            } while (string.IsNullOrWhiteSpace(pergunta.AlternativaC));
-
-            do
-            {
-                Console.Write("Alternativa D: ");
-                pergunta.AlternativaD = Console.ReadLine() ?? "";
-            } while (string.IsNullOrWhiteSpace(pergunta.AlternativaD));
-
-            pergunta.RespostaCorreta = LerResposta();
+                Enunciado = LerTexto("Enunciado: "),
+                AlternativaA = LerTexto("Alternativa A: "),
+                AlternativaB = LerTexto("Alternativa B: "),
+                AlternativaC = LerTexto("Alternativa C: "),
+                AlternativaD = LerTexto("Alternativa D: "),
+                RespostaCorreta = LerResposta()
+            };
 
             Console.Write("Explicação: ");
             pergunta.Explicacao = Console.ReadLine() ?? "";
@@ -351,7 +315,7 @@ namespace PI_1AnoDS
             context.Perguntas.Add(pergunta);
             context.SaveChanges();
 
-            Console.WriteLine("\nPergunta cadastrada com sucesso!");
+            Console.WriteLine("\nPergunta cadastrada!");
         }
 
         
@@ -359,18 +323,15 @@ namespace PI_1AnoDS
         {
             while (true)
             {
-                Console.Write("Resposta correta (A/B/C/D): ");
-
-                string resposta = (Console.ReadLine() ?? "")
-                    .Trim().ToUpper();
+                string resposta = LerTexto(
+                    "Resposta correta (A/B/C/D): "
+                ).ToUpper();
 
                 if (resposta == "A" || resposta == "B" ||
                     resposta == "C" || resposta == "D")
-                {
                     return resposta;
-                }
 
-                Console.WriteLine("Digite somente A, B, C ou D.");
+                Console.WriteLine("Digite A, B, C ou D!");
             }
         }
 
@@ -380,7 +341,7 @@ namespace PI_1AnoDS
             using var context = new AppDbContext();
 
             Console.Clear();
-            Console.WriteLine("===== PERGUNTAS CADASTRADAS =====");
+            Console.WriteLine("===== PERGUNTAS =====");
 
             var perguntas = context.Perguntas
                 .AsNoTracking()
@@ -395,9 +356,9 @@ namespace PI_1AnoDS
 
             foreach (var p in perguntas)
             {
-                Console.WriteLine("--------------------------------");
+                Console.WriteLine("\n------------------------");
                 Console.WriteLine($"ID: {p.Id}");
-                Console.WriteLine($"Enunciado: {p.Enunciado}");
+                Console.WriteLine($"Pergunta: {p.Enunciado}");
                 Console.WriteLine($"A) {p.AlternativaA}");
                 Console.WriteLine($"B) {p.AlternativaB}");
                 Console.WriteLine($"C) {p.AlternativaC}");
@@ -416,65 +377,30 @@ namespace PI_1AnoDS
             Console.Clear();
             Console.WriteLine("===== ATUALIZAR PERGUNTA =====");
 
-            int id = LerInteiro("Digite o ID da pergunta: ", 1);
-
+            int id = LerInteiro("ID da pergunta: ", 1);
             Pergunta? pergunta = context.Perguntas.Find(id);
 
             if (pergunta == null)
             {
-                Console.WriteLine("Pergunta não encontrada.");
+                Console.WriteLine("Pergunta não encontrada!");
                 return;
             }
 
-            Console.Write("Novo enunciado: ");
-            string enunciado = Console.ReadLine() ?? "";
-
-            if (string.IsNullOrWhiteSpace(enunciado))
-            {
-                Console.WriteLine("Enunciado inválido. Atualização cancelada.");
-                return;
-            }
-
-            Console.Write("Nova alternativa A: ");
-            string a = Console.ReadLine() ?? "";
-
-            Console.Write("Nova alternativa B: ");
-            string b = Console.ReadLine() ?? "";
-
-            Console.Write("Nova alternativa C: ");
-            string c = Console.ReadLine() ?? "";
-
-            Console.Write("Nova alternativa D: ");
-            string d = Console.ReadLine() ?? "";
-
-            if (string.IsNullOrWhiteSpace(a) ||
-                string.IsNullOrWhiteSpace(b) ||
-                string.IsNullOrWhiteSpace(c) ||
-                string.IsNullOrWhiteSpace(d))
-            {
-                Console.WriteLine("As alternativas não podem ficar vazias.");
-                return;
-            }
-
-            string resposta = LerResposta();
+            pergunta.Enunciado = LerTexto("Novo enunciado: ");
+            pergunta.AlternativaA = LerTexto("Nova alternativa A: ");
+            pergunta.AlternativaB = LerTexto("Nova alternativa B: ");
+            pergunta.AlternativaC = LerTexto("Nova alternativa C: ");
+            pergunta.AlternativaD = LerTexto("Nova alternativa D: ");
+            pergunta.RespostaCorreta = LerResposta();
 
             Console.Write("Nova explicação: ");
-            string explicacao = Console.ReadLine() ?? "";
+            pergunta.Explicacao = Console.ReadLine() ?? "";
 
-            int pontos = LerInteiro("Nova pontuação: ", 1);
-
-            pergunta.Enunciado = enunciado.Trim();
-            pergunta.AlternativaA = a.Trim();
-            pergunta.AlternativaB = b.Trim();
-            pergunta.AlternativaC = c.Trim();
-            pergunta.AlternativaD = d.Trim();
-            pergunta.RespostaCorreta = resposta;
-            pergunta.Explicacao = explicacao;
-            pergunta.Pontos = pontos;
+            pergunta.Pontos = LerInteiro("Nova pontuação: ", 1);
 
             context.SaveChanges();
 
-            Console.WriteLine("\nPergunta atualizada com sucesso!");
+            Console.WriteLine("\nPergunta atualizada!");
         }
 
         
@@ -485,18 +411,17 @@ namespace PI_1AnoDS
             Console.Clear();
             Console.WriteLine("===== EXCLUIR PERGUNTA =====");
 
-            int id = LerInteiro("Digite o ID da pergunta: ", 1);
-
+            int id = LerInteiro("ID da pergunta: ", 1);
             Pergunta? pergunta = context.Perguntas.Find(id);
 
             if (pergunta == null)
             {
-                Console.WriteLine("Pergunta não encontrada.");
+                Console.WriteLine("Pergunta não encontrada!");
                 return;
             }
 
             Console.WriteLine($"\n{pergunta.Enunciado}");
-            Console.Write("Confirma a exclusão? (S/N): ");
+            Console.Write("Deseja excluir? (S/N): ");
 
             string resposta = (Console.ReadLine() ?? "")
                 .Trim().ToUpper();
@@ -510,7 +435,7 @@ namespace PI_1AnoDS
             context.Perguntas.Remove(pergunta);
             context.SaveChanges();
 
-            Console.WriteLine("Pergunta excluída com sucesso!");
+            Console.WriteLine("Pergunta excluída!");
         }
 
         
@@ -536,7 +461,7 @@ namespace PI_1AnoDS
             foreach (var resultado in ranking)
             {
                 string nome = resultado.Usuario?.Nome
-                    ?? "Usuário não encontrado";
+                    ?? "Usuário desconhecido";
 
                 Console.WriteLine(
                     $"{posicao}º - {nome} | {resultado.Pontuacao} pontos"
