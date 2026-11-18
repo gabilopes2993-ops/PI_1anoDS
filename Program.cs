@@ -51,11 +51,11 @@ namespace PI_1AnoDS
                             break;
 
                         case 0:
-                            Console.WriteLine("\nObrigado por utilizar o NavegaSeguro!");
+                            Console.WriteLine("Obrigado por utilizar o NavegarSeguro");
                             break;
 
                         default:
-                            Console.WriteLine("\nOpção inválida!");
+                            Console.WriteLine("Opção inválida!");
                             Pausar();
                             break;
                     }
@@ -73,7 +73,7 @@ namespace PI_1AnoDS
         
         static void Pausar()
         {
-            Console.WriteLine("\nPressione ENTER para continuar...");
+            Console.WriteLine("Pressione ENTER para continuar...");
             Console.ReadLine();
         }
 
@@ -120,7 +120,7 @@ namespace PI_1AnoDS
 
                 if (resposta != "S")
                 {
-                    Console.WriteLine("Voltando ao menu principal...");
+                    Console.WriteLine("Voltando ao menu principal");
                     Pausar();
                     return;
                 }
