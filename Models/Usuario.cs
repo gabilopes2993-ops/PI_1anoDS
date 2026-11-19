@@ -28,7 +28,7 @@ namespace PI_1AnoDS.Models
         }
 
         
-        private static bool ValidarNome(string nome)
+        public static bool ValidarNome(string nome)
         {
             if (string.IsNullOrWhiteSpace(nome))
             {
