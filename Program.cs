@@ -12,7 +12,7 @@ namespace PI_1AnoDS
 {
     internal class Program
     {
-        private const string SenhaAdmin = "admin123";
+        
 
         static void Main(string[] args)
         {
@@ -379,19 +379,25 @@ namespace PI_1AnoDS
 
         static void LoginAdministrador()
         {
+            using var context = new AppDbContext();
+
             Console.Clear();
+            Console.WriteLine("===== LOGIN ADMINISTRADOR =====");
 
-            Console.WriteLine("================================");
-            Console.WriteLine("      LOGIN ADMINISTRADOR");
-            Console.WriteLine("================================");
+            Console.Write("E-mail: ");
+            string email = (Console.ReadLine() ?? "").Trim();
 
-            Console.Write("Digite a senha: ");
-
+            Console.Write("Senha: ");
             string senha = Console.ReadLine() ?? "";
 
-            if (senha != SenhaAdmin)
+            var admin = context.Usuarios.FirstOrDefault(u =>
+                u.Email == email &&
+                u.Senha == senha &&
+                u.TipoUsuario == "Admin");
+
+            if (admin == null)
             {
-                Console.WriteLine("\nSenha incorreta!");
+                Console.WriteLine("\nE-mail ou senha incorretos!");
                 Pausar();
                 return;
             }
