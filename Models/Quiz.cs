@@ -1,5 +1,7 @@
 
 
+
+
 using System;
 using System.Linq;
 using PI_1anoDS.Data;
@@ -20,7 +22,10 @@ namespace PI_1AnoDS.Models
             Console.WriteLine("==============================");
             Console.WriteLine("Jogador: " + usuario.Nome);
 
-            var perguntas = context.Perguntas.ToList();
+            var perguntas = context.Perguntas
+                .ToList()
+                .OrderBy(p => Guid.NewGuid())
+                .ToList();
 
             if (perguntas.Count == 0)
             {
@@ -41,18 +46,34 @@ namespace PI_1AnoDS.Models
                 while (true)
                 {
                     Console.Write("Sua resposta (A/B/C/D): ");
+
                     resposta = (Console.ReadLine() ?? "")
                         .Trim()
-                        .ToUpper();
+                        .ToUpperInvariant();
 
                     if (resposta == "A" || resposta == "B" ||
                         resposta == "C" || resposta == "D")
+                    {
                         break;
+                    }
 
                     Console.WriteLine("Alternativa inválida!");
                 }
 
-                if (resposta == pergunta.RespostaCorreta.Trim().ToUpper())
+                string respostaCorreta = (pergunta.RespostaCorreta ?? "")
+                    .Trim()
+                    .ToUpperInvariant();
+
+                if (respostaCorreta != "A" &&
+                    respostaCorreta != "B" &&
+                    respostaCorreta != "C" &&
+                    respostaCorreta != "D")
+                {
+                    Console.WriteLine("Erro: resposta correta inválida no cadastro da pergunta.");
+                    continue;
+                }
+
+                if (resposta == respostaCorreta)
                 {
                     Console.WriteLine("Resposta correta!");
                     pontuacao += pergunta.Pontos;
@@ -70,13 +91,32 @@ namespace PI_1AnoDS.Models
             Console.WriteLine("Jogador: " + usuario.Nome);
             Console.WriteLine("Pontuação: " + pontuacao);
 
-            
-            Ranking novoRanking = new Ranking();
+            Ranking? rankingExistente = context.Ranking
+                .FirstOrDefault(r => r.UsuarioId == usuario.Id);
 
-            novoRanking.UsuarioId = usuario.Id;
-            novoRanking.Pontuacao = pontuacao;
+            if (rankingExistente == null)
+            {
+                Ranking novoRanking = new Ranking();
 
-            context.Ranking.Add(novoRanking);
+                novoRanking.UsuarioId = usuario.Id;
+                novoRanking.Pontuacao = pontuacao;
+
+                context.Ranking.Add(novoRanking);
+
+                Console.WriteLine("\nPrimeira pontuação registrada no ranking!");
+            }
+            else if (pontuacao > rankingExistente.Pontuacao)
+            {
+                rankingExistente.Pontuacao = pontuacao;
+
+                Console.WriteLine("\nNova melhor pontuação registrada!");
+            }
+            else
+            {
+                Console.WriteLine("\nSua melhor pontuação continua sendo: "
+                    + rankingExistente.Pontuacao);
+            }
+
             context.SaveChanges();
 
             Console.WriteLine("\nPontuação salva no ranking!");
